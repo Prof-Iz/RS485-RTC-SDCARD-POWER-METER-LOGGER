@@ -26,7 +26,7 @@ File data;
 ModbusMaster node;
 
 char filename[10]; //to store the updating filename
-char time_stamp[5];
+char debug_time[20];
 
 int ID = 1; // Slave ID
 uint8_t result;
@@ -58,6 +58,8 @@ void setup()
   {
   }; // debugging
 
+  Serial.println(EEPROM[0]);
+
   if (!rtc.begin() || !SD.begin(10))
   {
     Serial.println("Error");
@@ -69,9 +71,9 @@ void setup()
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
   }
 
-  node.begin(ID, Serial);
-  node.preTransmission(preTransmission);
-  node.postTransmission(postTransmission);
+  //  node.begin(ID, Serial);
+  //  node.preTransmission(preTransmission);
+  //  node.postTransmission(postTransmission);
 }
 
 void loop()
@@ -81,42 +83,57 @@ void loop()
 
   if (now.day() != EEPROM[0])
   { // only remake file name for each day
-    sprintf(filename, "%i%i%i.csv", now.year(), now.month(), now.day());
-    //    Serial.println(filename);
+    sprintf(filename, "%i%i%i.txt", now.year(), now.month(), now.day());
+    Serial.println(filename);
     EEPROM[0] = now.day();
   }
 
+  data = SD.open(filename, FILE_WRITE);
+  Serial.println(data);
+
   if (data)
   {
-    data = SD.open(filename, FILE_WRITE);
+
+
+    Serial.println("In data loop");
     // req and write modbus
 
-    do
-    {                                              // give 2 chances to get proper reading.
-      result = node.readHoldingRegisters(0x3911, 5); //read 5 registers from 0x3911 onwards, function code 03
-                                                   //    freq = node.read(0x3915); // check if reading seperately still accurate enough
-                                                   //    VLN = node.read(0x3911);
-      error_counter--;
-    } while ((!node.ku8MBSuccess) and (error_counter > 0));
+    //    do
+    //    { // give 2 chances to get proper reading.
+    //      result = node.readHoldingRegisters(0x3911, 5); //read 5 registers from 0x3911 onwards, function code 03
+    //      //    freq = node.read(0x3915); // check if reading seperately still accurate enough
+    //      //    VLN = node.read(0x3911);
+    //      error_counter--;
+    //    } while ((!node.ku8MBSuccess) and (error_counter > 0));
 
     error_counter = 2; //reset error counter
 
-    if (node.ku8MBSuccess)
-    {
-      data.print(now.hour());
-      data.print(":");
-      data.print(now.minute());
-      //      00:00
+    //    if (node.ku8MBSuccess)
+    //    {
+    //      data.print(now.hour());
+    //      data.print(":");
+    //      data.print(now.minute());
+    //      //      00:00
+    //
+    //      data.print(",");
+    //      data.print(node.getResponseBuffer(0x00)); // VLN
+    //      data.print(",");
+    //      data.println(node.getResponseBuffer(0x04)); // Freq
+    //    }
 
-      data.print(",");
-      data.print(node.getResponseBuffer(0x00)); // VLN
-      data.print(",");
-      data.println(node.getResponseBuffer(0x04)); // Freq
-    }
+    // debugging
+    sprintf(debug_time,"%i:%i:%i",now.hour(),now.minute(),now.second());
+    
+    //      00:00:00
+    data.print(debug_time);
+    data.print(",");
+    data.println("Test");
+
 
     //
 
     data.close(); // to ensure that its saved properly
+    Serial.println(data);
   }
-  delay(60000); // a minute delay
+  delay(3000); // a minute delay
 }
