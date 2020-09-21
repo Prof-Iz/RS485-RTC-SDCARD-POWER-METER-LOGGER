@@ -117,6 +117,6 @@ void loop()
     //
 
     data.close(); // to ensure that its saved properly
-    delay(60000); // a minute delay
   }
+  delay(60000); // a minute delay
 }
