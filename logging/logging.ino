@@ -81,7 +81,7 @@ void loop()
 
   if (now.day() != EEPROM[0])
   { // only remake file name for each day
-    sprintf(filename, "%i%i%i.txt", now.year(), now.month(), now.day());
+    sprintf(filename, "%i%i%i.csv", now.year(), now.month(), now.day());
     //    Serial.println(filename);
     EEPROM[0] = now.day();
   }
