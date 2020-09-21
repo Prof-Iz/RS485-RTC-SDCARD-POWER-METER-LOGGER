@@ -93,7 +93,7 @@ void loop()
 
     do
     {                                              // give 2 chances to get proper reading.
-      result = node.readInputRegisters(0x3911, 5); //read 5 registers from 0x3911 onwards
+      result = node.readHoldingRegisters(0x3911, 5); //read 5 registers from 0x3911 onwards, function code 03
                                                    //    freq = node.read(0x3915); // check if reading seperately still accurate enough
                                                    //    VLN = node.read(0x3911);
       error_counter--;
