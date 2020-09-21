@@ -25,8 +25,10 @@ File data;
 
 ModbusMaster node;
 
-char filename[10]; //to store the updating filename
-char debug_time[20];
+char filename[12]; //to store the updating filename
+//char debug_time[20];
+
+int year_rtc;
 
 int ID = 1; // Slave ID
 uint8_t result;
@@ -58,8 +60,6 @@ void setup()
   {
   }; // debugging
 
-  Serial.println(EEPROM[0]);
-
   if (!rtc.begin() || !SD.begin(10))
   {
     Serial.println("Error");
@@ -79,11 +79,10 @@ void setup()
 void loop()
 {
   DateTime now = rtc.now(); // snapshot of current time
-  //  sprintf(time_stamp, "%i:%i", now.hour(), now.minute()); // prepare timestamp OR maybe do w modbus in one go?
 
   if (now.day() != EEPROM[0])
   { // only remake file name for each day
-    sprintf(filename, "%i%i%i.txt", now.year(), now.month(), now.day());
+    sprintf(filename, "%02d%02d%02d.csv", now.year() - 2000, now.month(), now.day());
     Serial.println(filename);
     EEPROM[0] = now.day();
   }
@@ -93,9 +92,6 @@ void loop()
 
   if (data)
   {
-
-
-    Serial.println("In data loop");
     // req and write modbus
 
     //    do
@@ -122,15 +118,31 @@ void loop()
     //    }
 
     // debugging
-    sprintf(debug_time,"%i:%i:%i",now.hour(),now.minute(),now.second());
+
     
-    //      00:00:00
-    data.print(debug_time);
+    data.print(now.hour());
+    data.print(":");
+    data.print(now.minute());
+    data.print(":");
+    data.print(now.second());
+    //      00:00
+
     data.print(",");
-    data.println("Test");
+    data.println(random());
 
 
-    //
+    Serial.print(now.hour());
+    Serial.print(":");
+    Serial.print(now.minute());
+    Serial.print(":");
+    Serial.print(now.second());
+    //      00:00
+
+    Serial.print(",");
+    Serial.println(random());
+
+
+
 
     data.close(); // to ensure that its saved properly
     Serial.println(data);
