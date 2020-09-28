@@ -1,23 +1,19 @@
-#include <ModbusRtu.h>
-
-Modbus bus;
-
-uint16_t modbus_array[] = {0,0,0};
- 
-
+#include <SensorModbusMaster.h>
+modbusMaster modbus;
 
 void setup() {
   // put your setup code here, to run once:
-  Serial.begin(9600);
-  bus = Modbus(1,1,4);
+  Serial.begin(9600,SERIAL_8E1);
+  pinMode(2,OUTPUT);
+  
+  modbus.begin(1,Serial,2);
+  
   
   
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-  String Response = Serial.readStringUntil("\n");
-  Serial.print("Response is");
-  Serial.println(Response);
-
+  Serial.println(modbus.float32FromRegister(0x03,3927,littleEndian));
+  delay(1000);
 }
